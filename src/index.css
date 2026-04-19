@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
+  --color-sunshine: #FFDE59;
+  --color-vibrant-red: #FF5757;
+  --color-vibrant-blue: #5CE1E6;
+  --color-vibrant-green: #7ED957;
+  --color-vibrant-purple: #CB6CE6;
+  --color-vibrant-orange: #FF914D;
+}
+
+@layer utilities {
+  .text-white-shadow {
+    text-shadow: 3px 3px 0px #FFFFFF;
+  }
+}
