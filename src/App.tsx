@@ -209,6 +209,17 @@ export default function App() {
   const current = ALPHABET[index];
 
   useEffect(() => {
+    // Warm up the voices list for Safari and Chrome
+    const warmup = () => {
+      window.speechSynthesis.getVoices();
+    };
+    warmup();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = warmup;
+    }
+  }, []);
+
+  useEffect(() => {
     // Auto-scroll active letter into view
     const activeItem = itemRefs.current[index];
     if (activeItem && scrollContainerRef.current) {
@@ -224,21 +235,29 @@ export default function App() {
     // Cancel any existing speech to avoid overlap
     window.speechSynthesis.cancel();
     
-    const utterance = new SpeechSynthesisUtterance(text);
+    // To prevent Safari from saying "capital A", we convert single letters to lowercase
+    const textToSpeak = text.length === 1 ? text.toLowerCase() : text;
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
     
     // Find a soothing Indian English voice (prefer female if possible)
     const voices = window.speechSynthesis.getVoices();
+    
+    // Comprehensive search for Indian English female voice
     const indianVoice = voices.find(v => 
-      (v.lang === 'en-IN' || v.lang === 'hi-IN') && 
-      (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('google'))
-    ) || voices.find(v => v.lang === 'en-IN');
+      (v.lang.includes('en-IN') || v.lang.includes('hi-IN')) && 
+      (v.name.toLowerCase().includes('female') || 
+       v.name.toLowerCase().includes('google') || 
+       v.name.toLowerCase().includes('veena') || 
+       v.name.toLowerCase().includes('heera') ||
+       v.name.toLowerCase().includes('ishita'))
+    ) || voices.find(v => v.lang.includes('en-IN'));
 
     if (indianVoice) {
       utterance.voice = indianVoice;
     }
 
     utterance.rate = 0.75; // Slightly slower for a "soothing" effect
-    utterance.pitch = 1.1; // Slightly higher pitch often feels friendlier for kids
+    utterance.pitch = 1; // Standard pitch is often safer for voice quality
     
     if (onEnd) {
       utterance.onend = onEnd;
